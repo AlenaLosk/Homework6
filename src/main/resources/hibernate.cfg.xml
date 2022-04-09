@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-configuration>
+    <session-factory>
+        <mapping class="model.Player"/>
+        <mapping class="model.Step"/>
+        <mapping class="model.GameResult"/>
+    </session-factory>
+</hibernate-configuration>
