@@ -11,16 +11,11 @@ import java.io.IOException;
 
 public class JSONWriter implements Writer {
     @Override
-    public void write(Game game, String fileName) throws IOException {
+    public void write(Game game) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        try (FileOutputStream stream = new FileOutputStream(fileName)) {
+        try (FileOutputStream stream = new FileOutputStream("src/main/resources/gameplay.json")) {
             mapper.writerWithDefaultPrettyPrinter().writeValue(stream, game);
         } catch (StreamWriteException | DatabindException ignore) {
         }
-    }
-
-    public <T> String write(T data) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(data);
     }
 }

@@ -62,11 +62,11 @@ public class Player implements Serializable {
 
     @Override
     public String toString() {
-        return "model.Player{" +
-                "id=" + num +
-                ", name='" + name + '\'' +
-                ", symbol='" + symbol + '\'' +
-                '}';
+        return "\"Player\": {\n" +
+                "\"_id\" : " + num +
+                ",\n \"_name\" : \"" + name + "\"" +
+                ",\n \"_symbol\" : \"" + symbol + "\"" +
+                "\n}";
     }
 
 }

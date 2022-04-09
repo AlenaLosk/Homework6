@@ -3,8 +3,9 @@ package controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import utils.*;
 import model.*;
-import exceptions.*;
+
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static spark.Spark.*;
 
@@ -15,9 +16,7 @@ public class Server {
     }
 
     public Server() {
-        Game game = new Game();
         final long[] lastGameplayId = new long[1];
-        lastGameplayId[0] = game.getGameplay().getGameplayId();
         Writer writer1 = new JSONWriter();
         Writer writer2 = new XMLWriter();
         Writer writer3 = new DBWriter();
@@ -38,11 +37,13 @@ public class Server {
                 res.type("application/json");
                 res.status(200);
                 try {
-                    lastGameplayId[0] = ((DBReader)reader2).readLastGameplayId();
-                    System.out.println(lastGameplayId[0]);
-                    Game game1 = reader2.read(Long.toString(lastGameplayId[0]));
-                    System.out.println(game1.toString());
-                    return ((JSONWriter) writer1).write(reader2.read(Long.toString(lastGameplayId[0])));
+                    DBReader dBReader = new DBReader();
+                    lastGameplayId[0] = dBReader.readLastGameplayId();
+                    Game game = dBReader.read(Long.toString(lastGameplayId[0]));
+                    Reader reader = new JSONReader();
+                    String jsonGame = ((JSONReader) reader).read(game, true);
+                    System.out.println(jsonGame);
+                    return jsonGame;
                 } catch (Exception ex) {
                     halt(500, "Convertation mistake on the server!");
                 }
@@ -52,10 +53,11 @@ public class Server {
             get("/winner", (req, res) -> {
                 res.type("application/json");
                 res.status(200);
+                Game game = new Game();
                 Player winner = game.getGameplay().getResult().getWinner();
                 if (winner != null) {
                     try {
-                        return ((JSONWriter) writer1).write(winner);
+                        return ((JSONReader) reader1).read(winner, true);
                     } catch (Exception ex) {
                         halt(500, "Convertation mistake on the server!");
                     }
@@ -64,7 +66,7 @@ public class Server {
                         lastGameplayId[0] = ((DBReader)reader2).readLastGameplayId();
                         GameResult gameResult = ((DBReader)reader2).readGameResult(Long.toString(lastGameplayId[0]));
                         System.out.println(gameResult.getWinner().toString());
-                        return ((JSONWriter) writer1).write(gameResult.getWinner());
+                        return ((JSONReader) reader1).read(gameResult.getWinner(), true);
                     } catch (Exception ex) {
                         halt(500, "Convertation mistake on the server!");
                     }
@@ -74,6 +76,7 @@ public class Server {
 
             delete("", (req, res) -> {
                 res.type("application/json");
+                Game game = new Game();
                 if (game.getGameplay().getPlayers() != null) {
                     lastGameplayId[0] = game.getGameplay().getGameplayId();
                     res.status(200);
@@ -89,6 +92,7 @@ public class Server {
 
             post("/new", (req, res) -> {
                 res.type("application/json");
+                Game game = new Game();
                 if (game.getGameplay().getPlayers() == null) {
                     String name1 = req.queryParams("name1");
                     String name2 = req.queryParams("name2");
@@ -108,8 +112,8 @@ public class Server {
                             game.getGameplay().setPlayers(players);
                             res.status(200);
                             try {
-                                ((DBWriter) writer3).writePlayers(game, "src\\main\\resources\\hibernate.cfg.xml");
-                                return ((JSONWriter) writer1).write(players);
+                                ((DBWriter) writer3).writePlayers(game);
+                                return ((JSONReader) reader1).read(players, true);
                             } catch (JsonProcessingException ex) {
                                 halt(500, "Convertation mistake on the server!");
                             }
@@ -123,6 +127,7 @@ public class Server {
 
             post("/step", (req, res) -> {
                 res.type("application/json");
+                Game game = new Game();
                 if (game.getGameplay().getPlayers() == null) {
                     halt(425, "Set the players' names! Use the request format - http://localhost:8080/gameplay/new?name1=Ivan&name2=Maria");
                 } else {
@@ -144,26 +149,26 @@ public class Server {
                             try {
                                 winner = game.getGameplay().process(currentPlayer, cell);
                                 List<Step> steps = game.getGameplay().getSteps().getStepsList();
-                                ((DBWriter) writer3).writeStep(steps.get(steps.size() - 1), "jdbc:h2:tcp://localhost:8080/homework6_db");
+                                ((DBWriter) writer3).writeStep(steps.get(steps.size() - 1));
                                 if (winner != null) {
-                                    writer1.write(game, "src/main/resources/gameplay.json");
-                                    writer2.write(game, "src/main/resources/gameplay.xml");
-                                    ((DBWriter) writer3).writeGameResult(game, "src\\main\\resources\\hibernate.cfg.xml");
+                                    writer1.write(game);
+                                    writer2.write(game);
+                                    ((DBWriter) writer3).writeGameResult(game);
                                     try {
                                         res.status(200);
                                         lastGameplayId[0] = game.getGameplay().getGameplayId();
                                         Player[] players = game.getGameplay().getPlayers();
                                         game.setGameplay(new Gameplay(game.getId()));
                                         game.getGameplay().setPlayers(players);
-                                        return "[" + ((JSONWriter) writer1).write(steps.get(steps.size() - 1)) +
-                                                ", " + ((JSONWriter) writer1).write(winner) + "]";
+                                        return "[" + ((JSONReader) reader1).read(steps.get(steps.size() - 1), true) +
+                                                ", " + ((JSONReader) reader1).read(winner, true) + "]";
                                     } catch (JsonProcessingException ex) {
                                         halt(500, "Convertation mistake on the server!");
                                     }
                                 } else {
                                     try {
                                         res.status(200);
-                                        return ((JSONWriter) writer1).write(steps.get(steps.size() - 1));
+                                        return ((JSONReader) reader1).read(steps.get(steps.size() - 1), true);
                                     } catch (JsonProcessingException ex) {
                                         halt(500, "Convertation mistake on the server!");
                                     }

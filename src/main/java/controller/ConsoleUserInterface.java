@@ -44,9 +44,9 @@ public class ConsoleUserInterface {
                             ConsoleHelper.printMessage(String.format("Winner is %s!", winner.getName()), true);
                         }
                         try {
-                            writer1.write(game, "src/main/resources/gameplay.json");
-                            writer2.write(game, "src/main/resources/gameplay.xml");
-                            ((DBWriter) writer3).write(game, "src\\main\\resources\\hibernate.cfg.xml");
+                            writer1.write(game);
+                            writer2.write(game);
+                            ((DBWriter) writer3).write(game);
                             lastGameplayId = game.getGameplay().getGameplayId();
                         } catch (IOException e) {
                             ConsoleHelper.printMessage("The file for writing game steps wasn't found!" + System.lineSeparator(), true);

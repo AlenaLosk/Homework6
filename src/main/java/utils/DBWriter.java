@@ -11,26 +11,23 @@ import java.util.List;
 
 public class DBWriter implements Writer {
     private SessionFactory factory;
-    @Getter
-    @Setter
-    private String resource = "src\\main\\resources\\hibernate.cfg.xml";
 
     public DBWriter() {
     }
 
     @Override
-    public void write(Game game, String resource) throws IOException {
+    public void write(Game game) throws IOException {
         if (factory == null) {
-            factory = HibernateUtil.getSessionFactory(resource);
+            factory = HibernateUtil.getSessionFactory();
         }
-        writePlayers(game, resource);
-        writeSteps(game, resource);
-        writeGameResult(game, resource);
+        writePlayers(game);
+        writeSteps(game);
+        writeGameResult(game);
     }
 
-    public void writePlayers(Game game, String resource) {
+    public void writePlayers(Game game) {
         if (factory == null) {
-            factory = HibernateUtil.getSessionFactory(resource);
+            factory = HibernateUtil.getSessionFactory();
         }
         Session session = factory.openSession();
         session.beginTransaction();
@@ -40,9 +37,9 @@ public class DBWriter implements Writer {
         session.close();
     }
 
-    public void writeSteps(Game game, String resource) {
+    public void writeSteps(Game game) {
         if (factory == null) {
-            factory = HibernateUtil.getSessionFactory(resource);
+            factory = HibernateUtil.getSessionFactory();
         }
         Session session = factory.openSession();
         session.beginTransaction();
@@ -54,9 +51,9 @@ public class DBWriter implements Writer {
         session.close();
     }
 
-    public void writeStep(Step step, String resource) {
+    public void writeStep(Step step) {
         if (factory == null) {
-            factory = HibernateUtil.getSessionFactory(resource);
+            factory = HibernateUtil.getSessionFactory();
         }
         Session session = factory.openSession();
         session.beginTransaction();
@@ -65,9 +62,9 @@ public class DBWriter implements Writer {
         session.close();
     }
 
-    public void writeGameResult(Game game, String resource) {
+    public void writeGameResult(Game game) {
         if (factory == null) {
-            factory = HibernateUtil.getSessionFactory(resource);
+            factory = HibernateUtil.getSessionFactory();
         }
         Session session = factory.openSession();
         session.beginTransaction();

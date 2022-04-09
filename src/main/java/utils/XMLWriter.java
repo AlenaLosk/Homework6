@@ -14,10 +14,10 @@ import java.io.FileOutputStream;
 
 public class XMLWriter implements Writer {
     @Override
-    public void write(Game game, String file) {
+    public void write(Game game) {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
         Gameplay gameplay = game.getGameplay();
-        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+        try (FileOutputStream outputStream = new FileOutputStream("src/main/resources/gameplay.xml")) {
             XMLEventWriter writer = factory.createXMLEventWriter(outputStream, "windows-1251");
             XMLEventFactory eventFactory = XMLEventFactory.newInstance();
             XMLEvent end = eventFactory.createDTD("\n");

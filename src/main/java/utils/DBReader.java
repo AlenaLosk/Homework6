@@ -11,26 +11,15 @@ import java.io.IOException;
 import java.util.List;
 
 public class DBReader implements Reader {
-    private SessionFactory playerFactory;
-    private SessionFactory stepFactory;
-    private SessionFactory gameResultFactory;
+    private SessionFactory factory;
 
     public DBReader() {
     }
 
     @Override
     public Game read(String gameplayId) throws IOException {
-        if (playerFactory == null) {
-            playerFactory = HibernateUtil.getPlayerSessionFactory("src\\main\\resources\\hibernate.cfg.xml", Player.class);
-        }
         Player[] players = readPlayers(gameplayId);
-        if (stepFactory == null) {
-            stepFactory = HibernateUtil.getStepSessionFactory("src\\main\\resources\\hibernate.cfg.xml", Step.class);
-        }
         List<Step> list = readStep(gameplayId);
-        if (gameResultFactory == null) {
-            gameResultFactory = HibernateUtil.getGameResultSessionFactory("src\\main\\resources\\hibernate.cfg.xml", GameResult.class);
-        }
         GameResult gameResult = readGameResult(gameplayId);
         Game game = new Game();
         game.getGameplay().setPlayers(players);
@@ -40,10 +29,10 @@ public class DBReader implements Reader {
     }
 
     public Player[] readPlayers(String gameplayId) {
-        if (playerFactory == null) {
-            playerFactory = HibernateUtil.getPlayerSessionFactory("src\\main\\resources\\hibernate.cfg.xml", Player.class);
+        if (factory == null) {
+            factory = HibernateUtil.getSessionFactory();
         }
-        Session session = playerFactory.openSession();
+        Session session = factory.openSession();
         session.beginTransaction();
         Player[] players = new Player[2];
         List<Player> list = null;
@@ -59,10 +48,10 @@ public class DBReader implements Reader {
     }
 
     public List<Step> readStep(String gameplayId) {
-        if (stepFactory == null) {
-            stepFactory = HibernateUtil.getStepSessionFactory("src\\main\\resources\\hibernate.cfg.xml", Step.class);
+        if (factory == null) {
+            factory = HibernateUtil.getSessionFactory();
         }
-        Session session = stepFactory.openSession();
+        Session session = factory.openSession();
         session.beginTransaction();
         List<Step> list = null;
         Query query = session.createNativeQuery("SELECT * FROM STEP WHERE gameplayId = " + gameplayId, Step.class);
@@ -73,10 +62,10 @@ public class DBReader implements Reader {
     }
 
     public GameResult readGameResult(String gameplayId) {
-        if (gameResultFactory == null) {
-            gameResultFactory = HibernateUtil.getGameResultSessionFactory("src\\main\\resources\\hibernate.cfg.xml", GameResult.class);
+        if (factory == null) {
+            factory = HibernateUtil.getSessionFactory();
         }
-        Session session = gameResultFactory.openSession();
+        Session session = factory.openSession();
         session.beginTransaction();
         Query query = session.createNativeQuery("SELECT * FROM GAMERESULT WHERE gameplayId = " + gameplayId, GameResult.class);
         List<GameResult> list = (List<GameResult>) query.getResultList();
@@ -86,10 +75,10 @@ public class DBReader implements Reader {
     }
 
     public Long readLastGameplayId() {
-        if (stepFactory == null) {
-            stepFactory = HibernateUtil.getStepSessionFactory("src\\main\\resources\\hibernate.cfg.xml", Step.class);
+        if (factory == null) {
+            factory = HibernateUtil.getSessionFactory();
         }
-        Session session = stepFactory.openSession();
+        Session session = factory.openSession();
         session.beginTransaction();
         Query query = session.createNativeQuery("SELECT * FROM STEP ORDER BY gameplayId DESC LIMIT 1;", Step.class);
         List<Step> steps = (List<Step>) query.getResultList();

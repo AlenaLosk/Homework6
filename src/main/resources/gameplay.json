@@ -1,6 +1,6 @@
 {
-  "Gameplay" : {
-    "Player" : [ {
+  "model.Gameplay" : {
+    "model.Player" : [ {
       "_id" : 1,
       "_name" : "Oleg",
       "_symbol" : "X"
@@ -9,8 +9,8 @@
       "_name" : "Anna",
       "_symbol" : "O"
     } ],
-    "Game" : {
-      "Step" : [ {
+    "model.Game" : {
+      "model.Step" : [ {
         "_num" : 1,
         "_playerId" : 1,
         "_text" : 1
@@ -32,8 +32,8 @@
         "_text" : 7
       } ]
     },
-    "GameResult" : {
-      "Player" : {
+    "model.GameResult" : {
+      "model.Player" : {
         "_id" : 1,
         "_name" : "Oleg",
         "_symbol" : "X"
